@@ -19,6 +19,10 @@ type handler struct {
 	targetKey  string
 }
 
+func (h *handler) GetRequest() *http.Request {
+	return h.req
+}
+
 func (h *handler) UpdateRequestAndResponse(req *http.Request, res http.ResponseWriter) {
 	// Update request
 	h.req = req

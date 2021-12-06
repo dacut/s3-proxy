@@ -114,10 +114,11 @@ This feature is powered by [go-chi/cors](https://github.com/go-chi/cors). You ca
 
 See more information [here](../feature-guide/key-rewrite.md).
 
-| Key    | Type   | Required | Default | Description                                             |
-| ------ | ------ | -------- | ------- | ------------------------------------------------------- |
-| source | String | Required | None    | Source regexp matcher with golang group naming support. |
-| target | String | Required | None    | Target template for new key send to S3.                 |
+| Key        | Type   | Required | Default | Description                                             |
+| ---------- | ------ | -------- | ------- | ------------------------------------------------------- |
+| source     | String | Required | None    | Source regexp matcher with golang group naming support. |
+| targetType | String | No       | `REGEX` | Possible values are `REGEX` or `TEMPLATE`.              |
+| target     | String | Required | None    | Target template for new key send to S3.                 |
 
 ## TargetTemplateConfig
 

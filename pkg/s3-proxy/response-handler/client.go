@@ -87,6 +87,8 @@ type ResponseHandler interface {
 	// UpdateRequestAndResponse will update request and response in object.
 	// This will used to update request and response in order to have the latest context values.
 	UpdateRequestAndResponse(req *http.Request, res http.ResponseWriter)
+	// GetRequest will return the actual request object.
+	GetRequest() *http.Request
 }
 
 // NewHandler will return a new response handler object.
