@@ -90,6 +90,7 @@ Temporary Items
 *.dll
 *.so
 *.dylib
+cmd/s3-proxy/s3-proxy
 
 # Test binary, built with `go test -c`
 *.test
