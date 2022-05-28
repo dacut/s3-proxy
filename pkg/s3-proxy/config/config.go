@@ -391,6 +391,7 @@ type GetActionConfig struct {
 // GetActionConfigConfig Get action configuration object configuration.
 type GetActionConfigConfig struct {
 	RedirectWithTrailingSlashForNotFoundFile bool              `mapstructure:"redirectWithTrailingSlashForNotFoundFile"`
+	ListFolderEnabled                        *bool             `mapstructure:"listFolderEnabled"`
 	IndexDocument                            string            `mapstructure:"indexDocument"`
 	StreamedFileHeaders                      map[string]string `mapstructure:"streamedFileHeaders"`
 	Webhooks                                 []*WebhookConfig  `mapstructure:"webhooks" validate:"dive"`

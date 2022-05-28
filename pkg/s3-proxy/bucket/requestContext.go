@@ -189,52 +189,61 @@ func (rctx *requestContext) manageGetFolder(ctx context.Context, key string, inp
 
 	// Check if index document is activated
 	if rctx.targetCfg.Actions != nil && rctx.targetCfg.Actions.GET != nil &&
-		rctx.targetCfg.Actions.GET.Config != nil &&
-		rctx.targetCfg.Actions.GET.Config.IndexDocument != "" {
-		// Create index key path
-		indexKey := path.Join(key, rctx.targetCfg.Actions.GET.Config.IndexDocument)
-		// Head index file in bucket
-		headOutput, err := rctx.s3ClientManager.
-			GetClientForTarget(rctx.targetCfg.Name).
-			HeadObject(ctx, indexKey)
-		// Check if error exists and not a not found error
-		if err != nil && !errors.Is(err, s3client.ErrNotFound) {
-			// Manage error response
-			resHan.InternalServerError(rctx.LoadFileContent, err)
-			// Stop
+		rctx.targetCfg.Actions.GET.Config != nil {
+		if rctx.targetCfg.Actions.GET.Config.ListFolderEnabled != nil &&
+			!*rctx.targetCfg.Actions.GET.Config.ListFolderEnabled {
+			err := fmt.Errorf("list folder is disabled for %s", key)
+			resHan.ForbiddenError(rctx.LoadFileContent, err)
+
 			return
 		}
-		// Check that we found the file
-		if headOutput != nil {
-			// Get data
-			err = rctx.streamFileForResponse(ctx, headOutput.Key, input)
-			// Check if error exists
-			if err != nil {
-				// Check if error is a not found error
-				// nolint: gocritic // Don't want a switch
-				if errors.Is(err, s3client.ErrNotFound) {
-					// Not found
-					resHan.NotFoundError(rctx.LoadFileContent)
 
-					return
-				} else if errors.Is(err, s3client.ErrNotModified) {
-					// Not modified
-					resHan.NotModified()
-
-					return
-				} else if errors.Is(err, s3client.ErrPreconditionFailed) {
-					// Precondition failed
-					resHan.PreconditionFailed()
-
-					return
-				}
-				// Response with error
+		if rctx.targetCfg.Actions.GET.Config.IndexDocument != "" {
+			// Create index key path
+			indexKey := path.Join(key, rctx.targetCfg.Actions.GET.Config.IndexDocument)
+			// Head index file in bucket
+			headOutput, err := rctx.s3ClientManager.
+				GetClientForTarget(rctx.targetCfg.Name).
+				HeadObject(ctx, indexKey)
+			// Check if error exists and not a not found error
+			if err != nil && !errors.Is(err, s3client.ErrNotFound) {
+				// Manage error response
 				resHan.InternalServerError(rctx.LoadFileContent, err)
 				// Stop
 				return
 			}
-			// Stop here because no error are present
-			return
+			// Check that we found the file
+			if headOutput != nil {
+				// Get data
+				err = rctx.streamFileForResponse(ctx, headOutput.Key, input)
+				// Check if error exists
+				if err != nil {
+					// Check if error is a not found error
+					// nolint: gocritic // Don't want a switch
+					if errors.Is(err, s3client.ErrNotFound) {
+						// Not found
+						resHan.NotFoundError(rctx.LoadFileContent)
+
+						return
+					} else if errors.Is(err, s3client.ErrNotModified) {
+						// Not modified
+						resHan.NotModified()
+
+						return
+					} else if errors.Is(err, s3client.ErrPreconditionFailed) {
+						// Precondition failed
+						resHan.PreconditionFailed()
+
+						return
+					}
+					// Response with error
+					resHan.InternalServerError(rctx.LoadFileContent, err)
+					// Stop
+					return
+				}
+				// Stop here because no error are present
+				return
+			}
 		}
 	}
 
